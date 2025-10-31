@@ -1,0 +1,17 @@
+{
+    "name": "AsmDef.ZipGame",
+    "rootNamespace": "",
+    "references": [
+        "GUID:472afa2f2eb86f140bf250e65cf09d5e",
+        "GUID:900d7c5141e1d2446811cee6721930d9"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

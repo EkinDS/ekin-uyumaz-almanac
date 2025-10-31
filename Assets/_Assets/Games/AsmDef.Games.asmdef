@@ -1,0 +1,16 @@
+{
+    "name": "AsmDef.Games",
+    "rootNamespace": "",
+    "references": [
+        "GUID:472afa2f2eb86f140bf250e65cf09d5e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

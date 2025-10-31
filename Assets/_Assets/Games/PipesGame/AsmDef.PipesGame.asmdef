@@ -1,0 +1,18 @@
+{
+    "name": "AsmDef.PipeSystem",
+    "rootNamespace": "",
+    "references": [
+        "GUID:472afa2f2eb86f140bf250e65cf09d5e",
+        "GUID:900d7c5141e1d2446811cee6721930d9",
+        "GUID:7620b39cf208c7948bd3e7f09dc35ed3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
