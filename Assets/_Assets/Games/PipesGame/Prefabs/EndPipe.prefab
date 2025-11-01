@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 22.5}
-  m_SizeDelta: {x: 10, y: 55}
+  m_AnchoredPosition: {x: 0, y: 35}
+  m_SizeDelta: {x: 15, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8664866112141158387
 CanvasRenderer:
@@ -110,7 +110,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 30, y: 30}
+  m_SizeDelta: {x: 45, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5485713866551216344
 CanvasRenderer:
@@ -184,8 +184,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 17.5}
-  m_SizeDelta: {x: 30, y: 65}
+  m_AnchoredPosition: {x: 0, y: 37.5}
+  m_SizeDelta: {x: 45, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &666130113136724167
 CanvasRenderer:
@@ -260,7 +260,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4842740296020175957
 CanvasRenderer:
@@ -338,11 +338,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2295943573516660104, guid: 2230e0864a2e7b7439eb34f593a7696a, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 2295943573516660104, guid: 2230e0864a2e7b7439eb34f593a7696a, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 2295943573516660104, guid: 2230e0864a2e7b7439eb34f593a7696a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -440,7 +440,6 @@ MonoBehaviour:
   - {fileID: 5940764051291161040}
   - {fileID: 1677549001697630919}
   baseConnections: 00000000
-  pipeType: 0
   rotation: 0
 --- !u!114 &8438688140198954538 stripped
 MonoBehaviour:
