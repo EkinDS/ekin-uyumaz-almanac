@@ -13,11 +13,15 @@ namespace _Assets.PipesGame
         [SerializeField] private List<Image> connectionIndicatorImages;
         [SerializeField] private List<int> baseConnections;
 
-        private PipesGameManager _gameManager;
+        private PipesGameManager pipesGameManager;
         private int gridX;
         private int gridY;
+        private int rotation;
+        private Color connectedColor = new Color(0.46F, 0.6F, 0.8F, 1F);
+        private Color disconnectedColor = new Color(0.95F, 0.94F, 0.92F, 1F);
 
-        public int rotation;
+
+        public bool IsConnected { get; set; }
 
 
         public void Initialize(int x, int y, int newRotation, PipesGameManager manager)
@@ -25,7 +29,7 @@ namespace _Assets.PipesGame
             gridX = x;
             gridY = y;
             rotation = newRotation;
-            _gameManager = manager;
+            pipesGameManager = manager;
 
             Rotate(false);
         }
@@ -37,24 +41,15 @@ namespace _Assets.PipesGame
 
             Rotate(true);
 
-            _gameManager?.OnPipeRotated();
+            pipesGameManager?.OnPipeRotated();
         }
 
 
-        public void BecomeConnected()
+        public void SetColor()
         {
             foreach (var connectionIndicatorImage in connectionIndicatorImages)
             {
-                connectionIndicatorImage.color = Color.cornflowerBlue;
-            }
-        }
-
-
-        public void BecomeDisconnected()
-        {
-            foreach (var connectionIndicatorImage in connectionIndicatorImages)
-            {
-                connectionIndicatorImage.color = Color.white;
+                connectionIndicatorImage.DOColor(IsConnected ? connectedColor : disconnectedColor, 0.2F);
             }
         }
 

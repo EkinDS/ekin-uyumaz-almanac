@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.95294124, g: 0.93725497, b: 0.9215687, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.95294124, g: 0.93725497, b: 0.9215687, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -440,7 +440,6 @@ MonoBehaviour:
   - {fileID: 5940764051291161040}
   - {fileID: 1677549001697630919}
   baseConnections: 00000000
-  rotation: 0
 --- !u!114 &8438688140198954538 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3048828994746134501, guid: 2230e0864a2e7b7439eb34f593a7696a, type: 3}
