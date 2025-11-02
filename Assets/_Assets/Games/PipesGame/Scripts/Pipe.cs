@@ -13,7 +13,7 @@ namespace _Assets.PipesGame
         [SerializeField] private List<Image> connectionIndicatorImages;
         [SerializeField] private List<int> baseConnections;
 
-        private PipesGameManager pipesGameManager;
+        private PipesGameplayUi pipesGameplayUi;
         private Image thisImage;
         private int gridX;
         private int gridY;
@@ -26,12 +26,12 @@ namespace _Assets.PipesGame
         public bool IsConnected { get; set; }
 
 
-        public void Initialize(int x, int y, int newRotation, PipesGameManager manager)
+        public void Initialize(int x, int y, int newRotation, PipesGameplayUi responsiblePipesGameplayUi)
         {
             gridX = x;
             gridY = y;
             rotation = newRotation;
-            pipesGameManager = manager;
+            pipesGameplayUi = responsiblePipesGameplayUi;
 
             Rotate(false);
         }
@@ -48,7 +48,7 @@ namespace _Assets.PipesGame
 
             Rotate(true);
 
-            pipesGameManager?.OnPipeRotated();
+            pipesGameplayUi?.OnPipeRotated();
         }
 
 

@@ -4,12 +4,12 @@ namespace _Assets.Core
 {
     public static class CoreEventHandler
     {
-        public static event Action<GameType> GameSelected;
+        public static event Action<GameType> GameTypeChosen;
 
         
-        public static void OnGameSelected(int gameTypeIndex)
+        public static void OnGameTypeChosen(int gameTypeIndex)
         {
-            GameSelected?.Invoke((GameType)gameTypeIndex);
+            GameTypeChosen?.Invoke((GameType)gameTypeIndex);
         }
     }
 }

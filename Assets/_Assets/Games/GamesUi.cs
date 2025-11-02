@@ -10,24 +10,25 @@ namespace _Assets.Games
 
         private IGameManager currentGameManager;
 
+        
         private void OnEnable()
         {
-            CoreEventHandler.GameSelected += GameSelected;
+            CoreEventHandler.GameTypeChosen += OnGameTypeChosen;
             GamesEventHandler.GameExited += GameExited;
         }
 
         
         private void OnDisable()
         {
-            CoreEventHandler.GameSelected -= GameSelected;
+            CoreEventHandler.GameTypeChosen -= OnGameTypeChosen;
             GamesEventHandler.GameExited -= GameExited;
         } 
 
         
-        private void GameSelected(GameType gameType)
+        private void OnGameTypeChosen(GameType gameType)
         {       
             currentGameManager = (IGameManager)(Instantiate(gamePrefabs[(int)gameType].prefab, transform));
-            currentGameManager.OnGameStarted();  
+            currentGameManager.OnGameTypeChosen();  
         }
 
 

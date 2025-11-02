@@ -7,7 +7,7 @@ namespace _Assets.MainMenu
     {
         public void GameButton(int gameType)
         {
-            CoreEventHandler.OnGameSelected(gameType);
+            CoreEventHandler.OnGameTypeChosen(gameType);
         }
     }
 }
