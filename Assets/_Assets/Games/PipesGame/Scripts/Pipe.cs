@@ -61,7 +61,10 @@ namespace _Assets.PipesGame
         {
             foreach (var connectionIndicatorImage in connectionIndicatorImages)
             {
-                connectionIndicatorImage.DOColor(IsConnected ? connectedColor : disconnectedColor, 0.2F);
+                if (!((IsConnected && connectionIndicatorImage.color == connectedColor) || (!IsConnected && connectionIndicatorImage.color == disconnectedColor)))
+                {
+                    connectionIndicatorImage.DOColor(IsConnected ? connectedColor : disconnectedColor, 0.2F);
+                }
             }
         }
 

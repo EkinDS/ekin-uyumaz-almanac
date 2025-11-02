@@ -27,6 +27,7 @@ namespace _Assets.PipesGame
         private Vector2Int startPipeCoordinates;
         private List<int>[,] gridConnections;
         private bool levelFinished;
+        private Sequence levelFinishSequence;
 
 
         private void Update()
@@ -160,9 +161,7 @@ namespace _Assets.PipesGame
             {
                 pipe.SetColor();
             }
-
-            pipes[startPipeCoordinates.x, startPipeCoordinates.y].BecomeStartPipe();
-
+            
             if (result.isFullyConnected)
             {
                 OnAllPipesConnected();
@@ -424,17 +423,17 @@ namespace _Assets.PipesGame
                 pipeContainerTransform.DOScale(1F, 0.4F).SetEase(Ease.InExpo);
             }));
 
-            Sequence s = DOTween.Sequence().Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+            levelFinishSequence = DOTween.Sequence().Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
                 .SetEase(Ease.InOutSine));
 
             for (int i = 0; i < 3; i++)
             {
-                s.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 5), 0.1F).SetEase(Ease.InOutSine));
-                s.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F).SetEase(Ease.InOutSine));
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 5), 0.1F).SetEase(Ease.InOutSine));
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F).SetEase(Ease.InOutSine));
             }
 
-            s.Append(pipeContainerTransform.DOLocalRotate(Vector3.zero, 0.1F).SetEase(Ease.InOutSine));
-            s.Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
+            levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(Vector3.zero, 0.1F).SetEase(Ease.InOutSine));
+            levelFinishSequence.Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
 
             continueButton.gameObject.SetActive(true);
         }
@@ -442,7 +441,7 @@ namespace _Assets.PipesGame
 
         private void OnDestroy()
         {
-            DOTween.Kill(gameObject);
+            levelFinishSequence.Kill();
         }
     }
 }
