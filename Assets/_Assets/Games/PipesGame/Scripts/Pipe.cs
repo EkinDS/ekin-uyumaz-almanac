@@ -14,12 +14,14 @@ namespace _Assets.PipesGame
         [SerializeField] private List<int> baseConnections;
 
         private PipesGameManager pipesGameManager;
+        private Image thisImage;
         private int gridX;
         private int gridY;
         private int rotation;
         private Color connectedColor = new Color(0.46F, 0.6F, 0.8F, 1F);
         private Color disconnectedColor = new Color(0.95F, 0.94F, 0.92F, 1F);
-
+        private Color winColor = new Color(0.78F, 0.87F, 1F, 1F);
+        private bool interactionDisabled;
 
         public bool IsConnected { get; set; }
 
@@ -37,6 +39,11 @@ namespace _Assets.PipesGame
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (interactionDisabled)
+            {
+                return;
+            }
+            
             rotation = (rotation + 90) % 360;
 
             Rotate(true);
@@ -50,6 +57,18 @@ namespace _Assets.PipesGame
             foreach (var connectionIndicatorImage in connectionIndicatorImages)
             {
                 connectionIndicatorImage.DOColor(IsConnected ? connectedColor : disconnectedColor, 0.2F);
+            }
+        }
+
+
+        public void ShowWinAnimation()
+        {
+            foreach (var connectionIndicatorImage in connectionIndicatorImages)
+            {
+                connectionIndicatorImage.DOColor(winColor, 0.2F).OnComplete((() =>
+                {
+                    connectionIndicatorImage.DOColor(connectedColor, 0.2F);
+                }));
             }
         }
 
@@ -87,9 +106,9 @@ namespace _Assets.PipesGame
         }
 
 
-        public void BecomeNormalPipe()
+        public void DisableInteraction()
         {
-            startPipeIndicatorImage.gameObject.SetActive(false);
+            interactionDisabled = true;
         }
 
 

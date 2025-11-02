@@ -5,6 +5,7 @@ using _Assets.Games;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace _Assets.PipesGame
@@ -13,8 +14,10 @@ namespace _Assets.PipesGame
     {
         [SerializeField] private Transform pipesBackgroundTransform;
         [SerializeField] private Transform instructionsBackgroundTransform;
+        [SerializeField] private Transform levelCompleteBackgroundTransform;
         [SerializeField] private CanvasGroup pipesCanvasGroup;
         [SerializeField] private CanvasGroup instructionCanvasGroup;
+        [SerializeField] private Button levelFinishButton;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private List<Pipe> pipePrefabs;
 
@@ -24,16 +27,13 @@ namespace _Assets.PipesGame
         private float gameStartTime;
         private Pipe[,] pipes;
         private Vector2Int startPipeCoordinates;
-        private List<int>[,] gridConnections; // logical connections per tile
+        private List<int>[,] gridConnections;
+        private bool levelFinished;
 
 
         private void Update()
         {
-            float elapsed = Time.time - gameStartTime;
-            int minutes = Mathf.FloorToInt(elapsed / 60f);
-            int seconds = Mathf.FloorToInt(elapsed % 60f);
-
-            timerText.text = $"{minutes:00}:{seconds:00}";
+            UpdateTimer();
         }
 
 
@@ -44,6 +44,12 @@ namespace _Assets.PipesGame
             ValidateAndHighlight();
             ShowPipes();
             StartTimer();
+        }
+
+
+        public void LevelFinishButton()
+        {
+            ShowLevelFinish();
         }
 
 
@@ -66,6 +72,21 @@ namespace _Assets.PipesGame
         }
 
 
+        private void UpdateTimer()
+        {
+            if (levelFinished)
+            {
+                return;
+            }
+
+            float elapsedTime = Time.time - gameStartTime;
+            int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+            int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+
+            timerText.text = $"{minutes:00}:{seconds:00}";
+        }
+
+
         private void StartTimer()
         {
             gameStartTime = Time.time;
@@ -74,8 +95,9 @@ namespace _Assets.PipesGame
 
         private void SetUiPositions()
         {
-            instructionsBackgroundTransform.transform.localPosition = new Vector3(0F, -2000F, 0F);
-            pipesBackgroundTransform.transform.localPosition = new Vector3(0F, -2000F, 0F);
+            instructionsBackgroundTransform.localPosition = new Vector3(0F, -2000F, 0F);
+            pipesBackgroundTransform.localPosition = new Vector3(0F, -2000F, 0F);
+            levelCompleteBackgroundTransform.localPosition = new Vector3(0F, -2000F, 0F);
             instructionCanvasGroup.alpha = 0F;
         }
 
@@ -90,6 +112,15 @@ namespace _Assets.PipesGame
         private void ShowPipes()
         {
             pipesBackgroundTransform.transform.DOLocalMoveY(0F, 0.5F).OnComplete((() =>
+            {
+                pipesCanvasGroup.DOFade(1F, 0.5F);
+            }));
+        }
+
+
+        private void ShowLevelFinish()
+        {
+            levelCompleteBackgroundTransform.transform.DOLocalMoveY(0F, 0.5F).OnComplete((() =>
             {
                 pipesCanvasGroup.DOFade(1F, 0.5F);
             }));
@@ -175,7 +206,7 @@ namespace _Assets.PipesGame
 
             if (result.isFullyConnected)
             {
-                StartCoroutine(AnimatePipesInConnectionOrder());
+                FinishLevel();
             }
         }
 
@@ -251,7 +282,6 @@ namespace _Assets.PipesGame
         }
 
 
-        //new stuff
         private enum PipeType
         {
             End,
@@ -259,7 +289,7 @@ namespace _Assets.PipesGame
             Elbow,
             Tee
         }
-        
+
 
         private bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < gridWidth && y < gridHeight;
 
@@ -327,7 +357,7 @@ namespace _Assets.PipesGame
             return connections;
         }
 
-        
+
         private static void DirectionsToTypeRotation(List<int> directions, out PipeType type)
         {
             var list = new List<int>(directions);
@@ -352,10 +382,32 @@ namespace _Assets.PipesGame
         }
 
 
+        private void FinishLevel()
+        {
+            levelFinished = true;
+            
+            foreach (var pipe in pipes)
+            {
+                pipe.DisableInteraction();
+            }
+
+            StartCoroutine(AnimatePipesInConnectionOrder());
+        }
+
+
         private IEnumerator AnimatePipesInConnectionOrder()
         {
-            var visited = new bool[gridWidth, gridHeight];
-            visited[startPipeCoordinates.x, startPipeCoordinates.y] = true;
+            yield return new WaitForSeconds(0.25F);
+
+            levelFinishButton.gameObject.SetActive(true);
+            
+            var visited = new bool[gridWidth][];
+            for (int index = 0; index < gridWidth; index++)
+            {
+                visited[index] = new bool[gridHeight];
+            }
+
+            visited[startPipeCoordinates.x][startPipeCoordinates.y] = true;
 
             var queue = new Queue<Vector2Int>();
             queue.Enqueue(startPipeCoordinates);
@@ -375,37 +427,35 @@ namespace _Assets.PipesGame
                     foreach (int dir in pipes[current.x, current.y].GetRotatedConnections())
                     {
                         Vector2Int next = current + GetOffset(dir);
-                        if (!InBounds(next.x, next.y) || visited[next.x, next.y])
+
+                        if (!InBounds(next.x, next.y) || visited[next.x][next.y])
+                        {
                             continue;
+                        }
 
                         int oppositeDir = GetOppositeDirection(dir);
-                        if (!pipes[next.x, next.y].GetRotatedConnections().Contains(oppositeDir))
-                            continue;
 
-                        visited[next.x, next.y] = true;
+                        if (!pipes[next.x, next.y].GetRotatedConnections().Contains(oppositeDir))
+                        {
+                            continue;
+                        }
+
+                        visited[next.x][next.y] = true;
                         queue.Enqueue(next);
                     }
                 }
 
-                // 🔹 Animate the pipes in this wave
                 foreach (Vector2Int pos in currentWave)
                 {
                     Pipe pipe = pipes[pos.x, pos.y];
                     if (pipe != null)
                     {
-                        pipe.transform
-                            .DOScale(1.2f, 0.15f)
-                            .SetEase(Ease.OutQuad)
-                            .OnComplete(() => pipe.transform.DOScale(1f, 0.15f).SetEase(Ease.InQuad));
+                        pipe.ShowWinAnimation();
                     }
                 }
 
-                // Wait before next wave
                 yield return new WaitForSeconds(0.1F);
             }
-
-            Debug.Log("All pipes animated in connection order!");
         }
-
     }
 }
