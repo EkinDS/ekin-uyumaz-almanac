@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using _Assets.Games;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -36,13 +37,15 @@ namespace _Assets.PipesGame
 
         public void Activate()
         {
+            gameObject.SetActive(true);
+
             InstantiatePipes();
             ChooseStartPipe();
             ValidateAndHighlight();
             ShowPipes();
             StartTimer();
         }
-
+        
 
         private void ShowPipes()
         {
@@ -56,6 +59,12 @@ namespace _Assets.PipesGame
         }
 
 
+        public void ContinueButton()
+        {
+            GamesEventHandler.OnGameplayCompleted(timerText.text);
+        }
+
+        
         private void UpdateTimer()
         {
             if (levelFinished)

@@ -16,6 +16,7 @@ namespace _Assets.PipesGame
 
         public void Activate()
         {
+            gameObject.SetActive(true);
             movementTween = transform.DOLocalMoveY(0F, 0.5F);
             fadeTween = canvasGroup.DOFade(1F, 0.5F);
         }

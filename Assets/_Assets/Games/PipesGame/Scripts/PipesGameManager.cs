@@ -24,9 +24,15 @@ namespace _Assets.PipesGame
         }
 
 
-        public void OnGameplayFinished()
+        public void BackButton()
         {
-            pipesVictoryUi.Activate();
+            GamesEventHandler.OnGameExited();
+        }
+
+        
+        private void OnGameplayFinished(string timerString)
+        {
+            pipesVictoryUi.Activate(timerString);
         }
         
         
@@ -35,12 +41,23 @@ namespace _Assets.PipesGame
             pipesGameplayUi.transform.localPosition = new Vector3(0F, -2000F, 0F);
             pipesIntroductionUi.transform.localPosition = new Vector3(0F, -2000F, 0F);
             pipesVictoryUi.transform.localPosition = new Vector3(0F, -2000F, 0F);
+            
+            pipesGameplayUi.gameObject.SetActive(false);
+            pipesIntroductionUi.gameObject.SetActive(false);
+            pipesVictoryUi.gameObject.SetActive(false);
         }
 
-
-        public void BackButton()
+        
+        private void OnEnable()
         {
-            GamesEventHandler.OnGameExited();
+            GamesEventHandler.GameplayCompleted += OnGameplayFinished;
         }
+
+
+        private void OnDisable()
+        {
+            GamesEventHandler.GameplayCompleted -= OnGameplayFinished;
+        }
+
     }
 }
