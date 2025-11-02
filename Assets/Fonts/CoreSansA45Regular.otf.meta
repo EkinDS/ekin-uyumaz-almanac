@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7b3a43458e5d8f343ba5c47202f957b8
+guid: 774f2eb3962efe24fa160f6373622d8d
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - FONTSPRING DEMO - Core Sans C 55 Medium
+  - Core Sans A
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
