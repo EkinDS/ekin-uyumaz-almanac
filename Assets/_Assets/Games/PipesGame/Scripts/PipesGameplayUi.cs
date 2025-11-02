@@ -139,7 +139,7 @@ namespace _Assets.PipesGame
             {
                 foreach (var pipe in pipes)
                 {
-                    Vector2Int p = new Vector2Int(pipe.GetX(), pipe.GetY());
+                    Vector2Int p = new Vector2Int(pipe.X, pipe.Y);
                     if (!result.connectedTiles.Contains(p) && p != startPipeCoordinates)
                     {
                         pipe.IsConnected = false;
@@ -216,10 +216,10 @@ namespace _Assets.PipesGame
         {
             switch (direction)
             {
-                case (int)PipeConnectionDirection.Up: return new Vector2Int(0, 1);
-                case (int)PipeConnectionDirection.Right: return new Vector2Int(1, 0);
-                case (int)PipeConnectionDirection.Down: return new Vector2Int(0, -1);
-                case (int)PipeConnectionDirection.Left: return new Vector2Int(-1, 0);
+                case 0: return new Vector2Int(0, 1);
+                case 1: return new Vector2Int(1, 0);
+                case 2: return new Vector2Int(0, -1);
+                case 3: return new Vector2Int(-1, 0);
                 default: return Vector2Int.zero;
             }
         }
@@ -348,7 +348,7 @@ namespace _Assets.PipesGame
         private IEnumerator AnimatePipesInConnectionOrder()
         {
             yield return new WaitForSeconds(0.25F);
-            
+
             var visited = new bool[gridWidth][];
             for (int index = 0; index < gridWidth; index++)
             {
@@ -409,13 +409,14 @@ namespace _Assets.PipesGame
             {
                 confettiParticle.Play();
             }
-            
+
             pipeContainerTransform.DOScale(1.1F, 0.4F).SetEase(Ease.OutExpo).OnComplete((() =>
             {
                 pipeContainerTransform.DOScale(1F, 0.4F).SetEase(Ease.InExpo);
             }));
-            
-            Sequence s = DOTween.Sequence().Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F).SetEase(Ease.InOutSine));
+
+            Sequence s = DOTween.Sequence().Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+                .SetEase(Ease.InOutSine));
 
             for (int i = 0; i < 3; i++)
             {
@@ -425,8 +426,14 @@ namespace _Assets.PipesGame
 
             s.Append(pipeContainerTransform.DOLocalRotate(Vector3.zero, 0.1F).SetEase(Ease.InOutSine));
             s.Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
-            
+
             continueButton.gameObject.SetActive(true);
+        }
+
+
+        private void OnDestroy()
+        {
+            DOTween.Kill(gameObject);
         }
     }
 }

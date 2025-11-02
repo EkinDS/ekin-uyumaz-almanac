@@ -10,11 +10,21 @@ namespace _Assets.PipesGame
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private Button continueButton;
 
+        private Tween movementTween;
+        private Tween fadeTween;
+
 
         public void Activate()
         {
-            transform.DOLocalMoveY(0F, 0.5F);
-            canvasGroup.DOFade(1F, 0.5F);
+            movementTween = transform.DOLocalMoveY(0F, 0.5F);
+            fadeTween = canvasGroup.DOFade(1F, 0.5F);
+        }
+
+
+        private void OnDestroy()
+        {
+            movementTween.Kill();
+            fadeTween.Kill();
         }
     }
 }

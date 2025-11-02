@@ -354,6 +354,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7836072318939983198, guid: 1002851770b3bc642a8b3dd14e1a6147, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5803495624348780602}
+    - target: {fileID: 7836072318939983198, guid: 1002851770b3bc642a8b3dd14e1a6147, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackButton
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -383,6 +391,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4133441730742437428}
     m_Modifications:
+    - target: {fileID: 1308827164377310017, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1308827164377310017, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1308827164377310017, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2767928312908976161, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2767928312908976161, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2767928312908976161, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3707510899906590611, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
       propertyPath: m_Name
       value: PipesGameplayUi
@@ -474,6 +506,14 @@ PrefabInstance:
     - target: {fileID: 6905053366246713544, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8262558125847442735, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5803495624348780602}
+    - target: {fileID: 8262558125847442735, guid: ec7056b59fc07224e9217d0d8d38b51d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackButton
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

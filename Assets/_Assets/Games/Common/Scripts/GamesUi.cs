@@ -10,25 +10,36 @@ namespace _Assets.Games
 
         private IGameManager currentGameManager;
 
-        
+
         private void OnEnable()
         {
             CoreEventHandler.GameTypeChosen += OnGameTypeChosen;
             GamesEventHandler.GameExited += GameExited;
         }
 
-        
+
         private void OnDisable()
         {
             CoreEventHandler.GameTypeChosen -= OnGameTypeChosen;
             GamesEventHandler.GameExited -= GameExited;
-        } 
+        }
 
-        
+
         private void OnGameTypeChosen(GameType gameType)
-        {       
-            currentGameManager = (IGameManager)(Instantiate(gamePrefabs[(int)gameType].prefab, transform));
-            currentGameManager.OnGameTypeChosen();  
+        {
+            GamePrefab selectedGame = default;
+
+            foreach (GamePrefab gamePrefab in gamePrefabs)
+            {
+                if (gamePrefab.gameType == gameType)
+                {
+                    selectedGame = gamePrefab;
+                    break;
+                }
+            }
+
+            currentGameManager = Instantiate(selectedGame.prefab, transform) as IGameManager;
+            currentGameManager.OnGameTypeChosen();
         }
 
 
@@ -41,11 +52,12 @@ namespace _Assets.Games
             }
         }
     }
-    
-    
+
+
     [Serializable]
     public struct GamePrefab
     {
+        public GameType gameType;
         public MonoBehaviour prefab;
     }
 }

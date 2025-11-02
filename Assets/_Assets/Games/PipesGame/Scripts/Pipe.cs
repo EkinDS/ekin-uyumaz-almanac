@@ -13,23 +13,28 @@ namespace _Assets.PipesGame
         [SerializeField] private List<Image> connectionIndicatorImages;
         [SerializeField] private List<int> baseConnections;
 
-        private PipesGameplayUi pipesGameplayUi;
-        private Image thisImage;
-        private int gridX;
-        private int gridY;
-        private int rotation;
         private Color connectedColor = new Color(0.46F, 0.6F, 0.8F, 1F);
         private Color disconnectedColor = new Color(0.95F, 0.94F, 0.92F, 1F);
         private Color winColor = new Color(0.78F, 0.87F, 1F, 1F);
+        private Image thisImage;
+        private PipesGameplayUi pipesGameplayUi;
         private bool interactionDisabled;
-
+        private int rotation;
+      
+        
         public bool IsConnected { get; set; }
+        
+        
+        public int X {get; private set;}
+        
+        
+        public int Y {get; private set;}
 
 
         public void Initialize(int x, int y, int newRotation, PipesGameplayUi responsiblePipesGameplayUi)
         {
-            gridX = x;
-            gridY = y;
+            X = x;
+            Y = y;
             rotation = newRotation;
             pipesGameplayUi = responsiblePipesGameplayUi;
 
@@ -73,18 +78,6 @@ namespace _Assets.PipesGame
         }
 
 
-        public int GetX()
-        {
-            return gridX;
-        }
-
-
-        public int GetY()
-        {
-            return gridY;
-        }
-
-
         public List<int> GetRotatedConnections()
         {
             var directions = new List<int>();
@@ -124,6 +117,12 @@ namespace _Assets.PipesGame
             {
                 containerTransform.localRotation = Quaternion.Euler(new Vector3(0F, 0F, -rotation));
             }
+        }
+        
+        
+        private void OnDestroy()
+        {
+            DOTween.Kill(gameObject);
         }
     }
 }

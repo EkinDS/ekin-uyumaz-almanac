@@ -9,16 +9,24 @@ namespace _Assets.PipesGame
     {
         [SerializeField] private Button continueButton;
 
+        private Tween movementTween;
+
         
         public void Activate()
         {
-            transform.DOLocalMoveY(0F, 0.5F);
+            movementTween =   transform.DOLocalMoveY(0F, 0.5F);
         }
 
 
         public void ContinueButton()
         {
             GamesEventHandler.OnGameExited();
+        }
+        
+        
+        private void OnDestroy()
+        {
+            movementTween.Kill();
         }
     }
 }
