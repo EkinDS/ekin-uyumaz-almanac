@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using _Assets.Core;
 using _Assets.Games;
 using DG.Tweening;
 using TMPro;
@@ -19,7 +20,7 @@ namespace _Assets.PipesGame
         //Note: Pipe Indices: End = 0, Straight = 1, Elbow = 2, Tee = 3
 
         [SerializeField] private CanvasGroup pipesCanvasGroup;
-        [SerializeField] private Button continueButton;
+        [SerializeField] private ButtonAnimator continueButton;
         [SerializeField] private Transform pipeContainerTransform;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private List<ParticleSystem> confettiParticles;
@@ -119,8 +120,6 @@ namespace _Assets.PipesGame
 
         public void ContinueButton()
         {
-            continueButton.enabled = false;
-
             GamesEventHandler.OnGameplayCompleted(timerText.text);
 
             DeleteSave();
@@ -489,7 +488,7 @@ namespace _Assets.PipesGame
             levelFinishSequence
                 .Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
 
-            continueButton.gameObject.SetActive(true);
+            continueButton.Appear();
         }
 
         private bool CanSave => gameObject.activeInHierarchy && !levelFinished;

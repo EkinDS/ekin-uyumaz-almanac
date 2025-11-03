@@ -1,4 +1,4 @@
-using _Assets.Games;
+using _Assets.Core;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -8,8 +8,10 @@ namespace _Assets.PipesGame
 {
     public class PipesVictoryUi : MonoBehaviour
     {
-        [SerializeField] private Button continueButton;
+        [SerializeField] private ButtonAnimator continueButton;
+        [SerializeField] private CanvasGroup timerDescriptionTextCanvasGroup;
         [SerializeField] private TextMeshProUGUI timerText;
+        [SerializeField] private TextMeshProUGUI congratulationsText;
 
         private PipesGameManager assignedPipesGameManager;
         private Tween movementTween;
@@ -25,6 +27,8 @@ namespace _Assets.PipesGame
         {
             gameObject.SetActive(true);
 
+            AnimateTexts();
+            
             movementTween = transform.DOLocalMoveY(0F, 0.5F);
 
             timerText.text = timerString;
@@ -40,6 +44,21 @@ namespace _Assets.PipesGame
         private void OnDestroy()
         {
             movementTween.Kill();
+        }
+
+
+        private void AnimateTexts()
+        {
+            congratulationsText.transform.localPosition = new Vector3(0F, 470F, 0F);
+            congratulationsText.DOFade(1F, 0.75F).SetDelay(0.5F);
+            congratulationsText.transform.DOLocalMoveY(570F, 0.75F).SetDelay(0.5F);
+            
+            timerDescriptionTextCanvasGroup.transform.localPosition = new Vector3(0F, 300F, 0F);
+            timerDescriptionTextCanvasGroup.DOFade(1F, 0.75F).SetDelay(1.2F);
+            timerDescriptionTextCanvasGroup.transform.DOLocalMoveY(400F, 0.75F).SetDelay(1.2F).OnComplete((() =>
+            {
+                continueButton.Appear();
+            }));
         }
     }
 }

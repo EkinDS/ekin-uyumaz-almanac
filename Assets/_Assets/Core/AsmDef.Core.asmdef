@@ -1,3 +1,16 @@
 {
-	"name": "AsmDef.Core"
+    "name": "AsmDef.Core",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7620b39cf208c7948bd3e7f09dc35ed3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
