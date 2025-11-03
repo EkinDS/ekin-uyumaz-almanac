@@ -11,7 +11,14 @@ namespace _Assets.PipesGame
         [SerializeField] private Button continueButton;
         [SerializeField] private TextMeshProUGUI timerText;
 
+        private PipesGameManager assignedPipesGameManager;
         private Tween movementTween;
+
+
+        public void Initialize(PipesGameManager pipesGameManager)
+        {
+            assignedPipesGameManager = pipesGameManager;
+        }
 
 
         public void Activate(string timerString)
@@ -26,7 +33,7 @@ namespace _Assets.PipesGame
 
         public void ContinueButton()
         {
-            GamesEventHandler.OnGameExited();
+            assignedPipesGameManager.BackButton();
         }
 
 

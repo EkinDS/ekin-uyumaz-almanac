@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using _Assets.Core;
 
 namespace _Assets.Games
@@ -13,7 +12,7 @@ namespace _Assets.Games
 
         private IGameManager currentGameManager;
         private GameObject currentInstanceGameObject;
-        private AsyncOperationHandle<GameObject>? currentHandle;
+        private bool gameInProgress;
 
 
         private void OnEnable()
@@ -32,10 +31,15 @@ namespace _Assets.Games
 
         private void OnGameTypeChosen(GameType gameType)
         {
-            var entry = gamePrefabs.FirstOrDefault(g => g.gameType == gameType);
+            if (gameInProgress)
+            {
+                return;
+            }
 
-            var handle = Addressables.InstantiateAsync(entry.prefab, transform);
-            currentHandle = handle;
+            gameInProgress = true;
+            
+            var gamePrefabOfCorrectGameType = gamePrefabs.FirstOrDefault(g => g.gameType == gameType);
+            var handle = Addressables.InstantiateAsync(gamePrefabOfCorrectGameType.prefab, transform);
 
             handle.Completed += operation =>
             {
@@ -48,6 +52,8 @@ namespace _Assets.Games
 
         private void GameExited()
         {
+            gameInProgress = false;
+
             Addressables.ReleaseInstance(currentInstanceGameObject);
             currentInstanceGameObject = null;
             currentGameManager = null;
@@ -60,5 +66,5 @@ namespace _Assets.Games
 public struct GamePrefab
 {
     public GameType gameType;
-    public AssetReferenceGameObject prefab;
+    public AssetReference prefab;
 }

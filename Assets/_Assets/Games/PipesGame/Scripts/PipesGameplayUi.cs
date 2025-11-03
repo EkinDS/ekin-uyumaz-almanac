@@ -1,11 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using _Assets.Games;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -17,28 +20,75 @@ namespace _Assets.PipesGame
         [SerializeField] private Button continueButton;
         [SerializeField] private Transform pipeContainerTransform;
         [SerializeField] private TextMeshProUGUI timerText;
-        [SerializeField] private List<Pipe> pipePrefabs;
         [SerializeField] private List<ParticleSystem> confettiParticles;
-
+        [SerializeField] private List<AssetReference> pipePrefabAssetReferences;
 
         private const float CellSize = 150F;
         private const float SaveCooldown = 0.25F;
         private const string SaveKey = "PipesGameSaveKey";
 
-        private float gameStartTime;
-        private float nextAllowedSaveTime;
-        private int gridWidth = 5;
-        private int gridHeight = 5;
-        private bool levelFinished;
+        private PipesGameManager assignedPipesGameManager;
         private Pipe[,] pipes;
         private List<int>[,] gridConnections;
         private Vector2Int startPipeCoordinates;
         private Sequence levelFinishSequence;
+        private List<Pipe> pipePrefabs;
+        private float gameStartTime;
+        private float nextAllowedSaveTime;
+        private bool levelFinished;
+        private int gridWidth = 5;
+        private int gridHeight = 5;
+
+
+        private readonly List<AsyncOperationHandle<GameObject>> loadedHandles = new();
+        private bool loadedPrefabs;
 
 
         private void Update()
         {
             UpdateTimer();
+        }
+
+
+        public void Initialize(PipesGameManager pipesGameManager)
+        {
+            assignedPipesGameManager = pipesGameManager;
+        }
+
+
+        public async Task<bool> LoadPipePrefabsAsync()
+        {
+            try
+            {
+                pipePrefabs = new List<Pipe>(pipePrefabAssetReferences.Count);
+
+                var tasks = new List<Task>();
+
+                foreach (var pipePrefabAssetReference in pipePrefabAssetReferences)
+                {
+                    var handle = pipePrefabAssetReference.LoadAssetAsync<GameObject>();
+                    loadedHandles.Add(handle);
+                    tasks.Add(handle.Task);
+                }
+
+                await Task.WhenAll(tasks);
+
+                foreach (var loadedHandle in loadedHandles)
+                {
+                    var loadedObject = loadedHandle.Result;
+
+                    pipePrefabs.Add(loadedObject.GetComponent<Pipe>());
+                }
+
+                loadedPrefabs = pipePrefabs.Count >= 4;
+
+                return loadedPrefabs;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Couldn't load pipe prefabs.");
+                return false;
+            }
         }
 
 
@@ -58,12 +108,6 @@ namespace _Assets.PipesGame
         }
 
 
-        private void ShowPipes()
-        {
-            transform.DOLocalMoveY(0F, 0.5F).OnComplete((() => { pipesCanvasGroup.DOFade(1F, 0.5F); }));
-        }
-
-
         public void OnPipeRotated()
         {
             ValidateAndHighlight();
@@ -78,9 +122,30 @@ namespace _Assets.PipesGame
 
         public void ContinueButton()
         {
+            continueButton.enabled = false;
+
             GamesEventHandler.OnGameplayCompleted(timerText.text);
 
             DeleteSave();
+        }
+
+
+        public void BackButton()
+        {
+            if (levelFinished)
+            {
+                return;
+            }
+
+            assignedPipesGameManager.BackButton();
+
+            SaveGame();
+        }
+
+
+        private void ShowPipes()
+        {
+            transform.DOLocalMoveY(0F, 0.5F).OnComplete((() => { pipesCanvasGroup.DOFade(1F, 0.5F); }));
         }
 
 
@@ -168,6 +233,7 @@ namespace _Assets.PipesGame
                 foreach (var pipe in pipes)
                 {
                     Vector2Int p = new Vector2Int(pipe.X, pipe.Y);
+                    
                     if (!result.connectedTiles.Contains(p) && p != startPipeCoordinates)
                     {
                         pipe.IsConnected = false;
@@ -267,22 +333,9 @@ namespace _Assets.PipesGame
         }
 
 
-        private bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < gridWidth && y < gridHeight;
-
-
-        private int Opp(int d) => (d + 2) % 4;
-
-
-        private static Vector2Int DirOffset(int dir)
+        private bool InBounds(int x, int y)
         {
-            switch (dir)
-            {
-                case 0: return new Vector2Int(0, 1); // Up
-                case 1: return new Vector2Int(1, 0); // Right
-                case 2: return new Vector2Int(0, -1); // Down
-                case 3: return new Vector2Int(-1, 0); // Left
-                default: return Vector2Int.zero;
-            }
+            return x >= 0 && y >= 0 && x < gridWidth && y < gridHeight;
         }
 
 
@@ -307,11 +360,11 @@ namespace _Assets.PipesGame
                 Vector2Int current = stack.Pop();
 
                 int[] directions = { 0, 1, 2, 3 };
-                directions = directions.OrderBy(_ => rng.Next()).ToArray(); // easy shuffle
+                directions = directions.OrderBy(_ => rng.Next()).ToArray();
 
                 foreach (int dir in directions)
                 {
-                    Vector2Int next = current + DirOffset(dir);
+                    Vector2Int next = current + GetOffset(dir);
 
                     if (!InBounds(next.x, next.y) || visited[next.x, next.y])
                     {
@@ -319,7 +372,7 @@ namespace _Assets.PipesGame
                     }
 
                     connections[current.x, current.y].Add(dir);
-                    connections[next.x, next.y].Add(Opp(dir));
+                    connections[next.x, next.y].Add(GetOppositeDirection(dir));
 
                     visited[next.x, next.y] = true;
 
@@ -444,14 +497,14 @@ namespace _Assets.PipesGame
             }));
 
             levelFinishSequence = DOTween.Sequence().Append(pipeContainerTransform
-                .DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+                .DOLocalRotate(new Vector3(0, 0, -3), 0.1F)
                 .SetEase(Ease.InOutSine));
 
             for (int i = 0; i < 3; i++)
             {
-                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 5), 0.1F)
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 3), 0.1F)
                     .SetEase(Ease.InOutSine));
-                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -3), 0.1F)
                     .SetEase(Ease.InOutSine));
             }
 
@@ -467,6 +520,16 @@ namespace _Assets.PipesGame
         private void OnDestroy()
         {
             levelFinishSequence.Kill();
+
+
+            // Yüklenenleri serbest bırakın
+            foreach (var h in loadedHandles)
+            {
+                if (h.IsValid()) Addressables.Release(h);
+            }
+
+            loadedHandles.Clear();
+            loadedPrefabs = false;
         }
 
 

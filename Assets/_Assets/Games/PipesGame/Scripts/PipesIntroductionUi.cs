@@ -1,4 +1,3 @@
-using _Assets.Games;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,16 +8,38 @@ namespace _Assets.PipesGame
     {
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private Button continueButton;
+        [SerializeField] private Button backButton;
 
+        private PipesGameManager assignedPipesGameManager;
         private Tween movementTween;
         private Tween fadeTween;
 
 
+        public void Initialize(PipesGameManager pipesGameManager)
+        {
+            assignedPipesGameManager = pipesGameManager;
+        }
+        
+        
         public void Activate()
         {
             gameObject.SetActive(true);
             movementTween = transform.DOLocalMoveY(0F, 0.5F);
             fadeTween = canvasGroup.DOFade(1F, 0.5F);
+        }
+
+
+        public void ContinueButton()
+        {
+            continueButton.enabled = false;
+            
+            assignedPipesGameManager.OnIntroductionFinished();
+        }
+
+
+        public void BackButton()
+        {
+            assignedPipesGameManager.BackButton();
         }
 
 

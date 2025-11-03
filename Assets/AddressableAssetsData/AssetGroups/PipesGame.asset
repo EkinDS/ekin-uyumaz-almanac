@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: PipesGame
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: PipesGame
+  m_GUID: 5f1bd322419a8c149b0b1fb55c931cec
+  m_SerializeEntries:
+  - m_GUID: 2fe3afc1998f5f14aaf6bd5c70aae8b8
+    m_Address: Assets/_Assets/Games/PipesGame/Prefabs/Pipes/EndPipe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pipes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96611957e6be0da46b4e2bbcf65a8b7a
+    m_Address: Assets/_Assets/Games/PipesGame/Prefabs/Pipes/TeePipe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pipes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b8668002f09781147a952ff1538ce6b4
+    m_Address: Assets/_Assets/Games/PipesGame/Prefabs/Pipes/StraightPipe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pipes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0f6b484ff02cf14a8f82e0c7693d8d3
+    m_Address: PipesGameManager
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pipes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cb4e6d9fe5c3bea41b5c3d38f85cac52
+    m_Address: Assets/_Assets/Games/PipesGame/Prefabs/Pipes/ElbowPipe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pipes
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: c5bfeec1bb0414146a4edafa7d396cf3, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 02c54ee91c5c276448c96939118b5bdf, type: 2}
+    - {fileID: 11400000, guid: 256192e5746d90d498e2d0ec699c8a8b, type: 2}

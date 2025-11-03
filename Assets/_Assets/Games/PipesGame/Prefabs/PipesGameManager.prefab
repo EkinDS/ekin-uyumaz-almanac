@@ -90,7 +90,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: AsmDef.PipeSystem::PipesIntroductionUi
   canvasGroup: {fileID: 3907958521994227965}
-  continueButton: {fileID: 0}
+  continueButton: {fileID: 4046665806361228116}
+  backButton: {fileID: 3948214206533256709}
 --- !u!1 &637703880099112119
 GameObject:
   m_ObjectHideFlags: 0
@@ -1192,7 +1193,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -6273,7 +6274,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -15915,9 +15916,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5803495624348780602}
-        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesGameManager, AsmDef.PipeSystem
-        m_MethodName: OnIntroductionFinished
+      - m_Target: {fileID: 6151846157982238875}
+        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesIntroductionUi, AsmDef.PipeSystem
+        m_MethodName: ContinueButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16371,8 +16372,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5803495624348780602}
-        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesGameManager, AsmDef.PipeSystem
+      - m_Target: {fileID: 6151846157982238875}
+        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesIntroductionUi, AsmDef.PipeSystem
         m_MethodName: BackButton
         m_Mode: 1
         m_Arguments:
@@ -21588,7 +21589,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7064449151351137034}
-  m_LocalRotation: {x: -0, y: -0, z: 1, w: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
@@ -21596,10 +21597,10 @@ RectTransform:
   - {fileID: 7064449150620160275}
   - {fileID: 7034811828966986826}
   m_Father: {fileID: 1996205433407642594}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 491.56}
+  m_AnchoredPosition: {x: 0, y: 576.99994}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!198 &7064449151351137269
@@ -26778,7 +26779,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 491.56}
+  m_AnchoredPosition: {x: 0, y: 577}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!198 &426304458501685906
@@ -31933,14 +31934,30 @@ MonoBehaviour:
   continueButton: {fileID: 3790433295794168343}
   pipeContainerTransform: {fileID: 4611788535385559056}
   timerText: {fileID: 8847305468069861429}
-  pipePrefabs:
-  - {fileID: 5858213024753076916, guid: 2fe3afc1998f5f14aaf6bd5c70aae8b8, type: 3}
-  - {fileID: 6677582323065345566, guid: b8668002f09781147a952ff1538ce6b4, type: 3}
-  - {fileID: 5020970349835974016, guid: cb4e6d9fe5c3bea41b5c3d38f85cac52, type: 3}
-  - {fileID: 7548716910800553184, guid: 96611957e6be0da46b4e2bbcf65a8b7a, type: 3}
   confettiParticles:
   - {fileID: 7064449151351137269}
   - {fileID: 426304458501685906}
+  pipePrefabAssetReferences:
+  - m_AssetGUID: 2fe3afc1998f5f14aaf6bd5c70aae8b8
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: b8668002f09781147a952ff1538ce6b4
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: cb4e6d9fe5c3bea41b5c3d38f85cac52
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 96611957e6be0da46b4e2bbcf65a8b7a
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
 --- !u!1 &8693750501188344631
 GameObject:
   m_ObjectHideFlags: 0
@@ -32059,8 +32076,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 710f234b974e75846827d684be4d8857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PipeGridManager
-  pipesGameplayUi: {fileID: 6865762836180443270}
   pipesIntroductionUi: {fileID: 6151846157982238875}
+  pipesGameplayUi: {fileID: 6865762836180443270}
   pipesVictoryUi: {fileID: 2163239998716507669}
 --- !u!225 &8970461253667805753
 CanvasGroup:
@@ -32194,8 +32211,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5803495624348780602}
-        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesGameManager, AsmDef.PipeSystem
+      - m_Target: {fileID: 6865762836180443270}
+        m_TargetAssemblyTypeName: _Assets.PipesGame.PipesGameplayUi, AsmDef.PipeSystem
         m_MethodName: BackButton
         m_Mode: 1
         m_Arguments:
