@@ -1,6 +1,9 @@
 using System;
-using _Assets.Core;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using _Assets.Core;
 
 namespace _Assets.Games
 {
@@ -9,6 +12,8 @@ namespace _Assets.Games
         [SerializeField] private GamePrefab[] gamePrefabs;
 
         private IGameManager currentGameManager;
+        private GameObject currentInstanceGameObject;
+        private AsyncOperationHandle<GameObject>? currentHandle;
 
 
         private void OnEnable()
@@ -27,37 +32,33 @@ namespace _Assets.Games
 
         private void OnGameTypeChosen(GameType gameType)
         {
-            GamePrefab selectedGame = default;
+            var entry = gamePrefabs.FirstOrDefault(g => g.gameType == gameType);
 
-            foreach (GamePrefab gamePrefab in gamePrefabs)
+            var handle = Addressables.InstantiateAsync(entry.prefab, transform);
+            currentHandle = handle;
+
+            handle.Completed += operation =>
             {
-                if (gamePrefab.gameType == gameType)
-                {
-                    selectedGame = gamePrefab;
-                    break;
-                }
-            }
-
-            currentGameManager = Instantiate(selectedGame.prefab, transform) as IGameManager;
-            currentGameManager.OnGameTypeChosen();
+                currentInstanceGameObject = operation.Result;
+                currentGameManager = currentInstanceGameObject.GetComponent<IGameManager>();
+                currentGameManager.OnGameTypeChosen();
+            };
         }
 
 
         private void GameExited()
         {
-            if (currentGameManager != null)
-            {
-                Destroy(((MonoBehaviour)currentGameManager).gameObject);
-                currentGameManager = null;
-            }
+            Addressables.ReleaseInstance(currentInstanceGameObject);
+            currentInstanceGameObject = null;
+            currentGameManager = null;
         }
     }
+}
 
 
-    [Serializable]
-    public struct GamePrefab
-    {
-        public GameType gameType;
-        public MonoBehaviour prefab;
-    }
+[Serializable]
+public struct GamePrefab
+{
+    public GameType gameType;
+    public AssetReferenceGameObject prefab;
 }
