@@ -19,7 +19,6 @@ namespace _Assets.PipesGame
         private Image thisImage;
         private PipesGameplayUi pipesGameplayUi;
         private bool interactionDisabled;
-        private int rotation;
       
         
         public bool IsConnected { get; set; }
@@ -29,13 +28,17 @@ namespace _Assets.PipesGame
         
         
         public int Y {get; private set;}
+        
+        
+        public int Rotation { get; private set; }
+
 
 
         public void Initialize(int x, int y, int newRotation, PipesGameplayUi responsiblePipesGameplayUi)
         {
             X = x;
             Y = y;
-            rotation = newRotation;
+            Rotation = newRotation;
             pipesGameplayUi = responsiblePipesGameplayUi;
 
             Rotate(false);
@@ -49,7 +52,7 @@ namespace _Assets.PipesGame
                 return;
             }
             
-            rotation = (rotation + 90) % 360;
+            Rotation = (Rotation + 90) % 360;
 
             Rotate(true);
 
@@ -85,7 +88,7 @@ namespace _Assets.PipesGame
         {
             var directions = new List<int>();
 
-            int rotationSteps = (rotation % 360 + 360) % 360 / 90;
+            int rotationSteps = (Rotation % 360 + 360) % 360 / 90;
 
             foreach (int baseConnection in baseConnections)
             {
@@ -112,13 +115,13 @@ namespace _Assets.PipesGame
         {
             if (animate)
             {
-                containerTransform.DOLocalRotate(new Vector3(0f, 0f, -rotation), 0.15f).SetEase(Ease.OutQuad);
+                containerTransform.DOLocalRotate(new Vector3(0f, 0f, -Rotation), 0.15f).SetEase(Ease.OutQuad);
                 containerTransform.DOScale(0.8f, 0.075f).SetEase(Ease.OutQuad).OnComplete(() =>
                     containerTransform.DOScale(1f, 0.075f).SetEase(Ease.OutQuad));
             }
             else
             {
-                containerTransform.localRotation = Quaternion.Euler(new Vector3(0F, 0F, -rotation));
+                containerTransform.localRotation = Quaternion.Euler(new Vector3(0F, 0F, -Rotation));
             }
         }
         

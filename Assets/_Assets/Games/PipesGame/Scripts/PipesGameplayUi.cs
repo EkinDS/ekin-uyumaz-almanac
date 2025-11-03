@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using _Assets.Games;
 using DG.Tweening;
@@ -40,13 +41,17 @@ namespace _Assets.PipesGame
         {
             gameObject.SetActive(true);
 
-            InstantiatePipes();
-            ChooseStartPipe();
+            if (!TryLoadGame())
+            {
+                InstantiatePipes();
+                ChooseStartPipe();
+                StartTimer();
+            }
+
             ValidateAndHighlight();
             ShowPipes();
-            StartTimer();
         }
-        
+
 
         private void ShowPipes()
         {
@@ -57,15 +62,19 @@ namespace _Assets.PipesGame
         public void OnPipeRotated()
         {
             ValidateAndHighlight();
+
+            SaveGame();
         }
 
 
         public void ContinueButton()
         {
             GamesEventHandler.OnGameplayCompleted(timerText.text);
+
+            DeleteSave();
         }
 
-        
+
         private void UpdateTimer()
         {
             if (levelFinished)
@@ -161,7 +170,7 @@ namespace _Assets.PipesGame
             {
                 pipe.SetColor();
             }
-            
+
             if (result.isFullyConnected)
             {
                 OnAllPipesConnected();
@@ -349,6 +358,8 @@ namespace _Assets.PipesGame
                 pipe.DisableInteraction();
             }
 
+            DeleteSave();
+
             StartCoroutine(AnimatePipesInConnectionOrder());
         }
 
@@ -423,17 +434,22 @@ namespace _Assets.PipesGame
                 pipeContainerTransform.DOScale(1F, 0.4F).SetEase(Ease.InExpo);
             }));
 
-            levelFinishSequence = DOTween.Sequence().Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+            levelFinishSequence = DOTween.Sequence().Append(pipeContainerTransform
+                .DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
                 .SetEase(Ease.InOutSine));
 
             for (int i = 0; i < 3; i++)
             {
-                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 5), 0.1F).SetEase(Ease.InOutSine));
-                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F).SetEase(Ease.InOutSine));
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, 5), 0.1F)
+                    .SetEase(Ease.InOutSine));
+                levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(new Vector3(0, 0, -5), 0.1F)
+                    .SetEase(Ease.InOutSine));
             }
 
-            levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(Vector3.zero, 0.1F).SetEase(Ease.InOutSine));
-            levelFinishSequence.Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
+            levelFinishSequence.Append(pipeContainerTransform.DOLocalRotate(Vector3.zero, 0.1F)
+                .SetEase(Ease.InOutSine));
+            levelFinishSequence
+                .Append(pipeContainerTransform.DOScale(1.05F, 1F).SetDelay(0.15F).SetLoops(10, LoopType.Yoyo)).Play();
 
             continueButton.gameObject.SetActive(true);
         }
@@ -442,6 +458,146 @@ namespace _Assets.PipesGame
         private void OnDestroy()
         {
             levelFinishSequence.Kill();
+        }
+
+
+        //save load
+
+        [System.Serializable]
+        public class PipeData
+        {
+            public int x;
+            public int y;
+            public int rotation;
+            public List<int> connections;
+        }
+
+        [System.Serializable]
+        public class BoardData
+        {
+            public int width;
+            public int height;
+            public int startX;
+            public int startY;
+            public float elapsedSeconds;
+            public List<PipeData> cells;
+        }
+
+
+        private const string SaveKey = "PipesGameSaveKey";
+
+        private bool CanSave => gameObject.activeInHierarchy && !levelFinished;
+
+
+        private void OnApplicationPause(bool pause)
+        {
+            if (pause)
+            {
+                SaveGame();
+            }
+        }
+
+
+        private void OnApplicationQuit()
+        {
+            SaveGame();
+        }
+
+
+        private void SaveGame()
+        {
+            if (!CanSave || pipes == null)
+            {
+                return;
+            }
+
+            BoardData boardData = new BoardData
+            {
+                width = gridWidth,
+                height = gridHeight,
+                startX = startPipeCoordinates.x,
+                startY = startPipeCoordinates.y,
+                elapsedSeconds = Time.time - gameStartTime,
+                cells = new List<PipeData>(gridWidth * gridHeight)
+            };
+
+            for (int a = 0; a < gridWidth; a++)
+            {
+                for (int b = 0; b < gridHeight; b++)
+                {
+                    boardData.cells.Add(new PipeData
+                    {
+                        x = a,
+                        y = b,
+                        rotation = pipes[a, b].Rotation,
+                        connections = new List<int>(gridConnections[a, b])
+                    });
+                }
+            }
+
+            string json = JsonUtility.ToJson(boardData, false);
+            PlayerPrefs.SetString(SaveKey, json);
+            PlayerPrefs.Save();
+        }
+
+
+        private bool TryLoadGame()
+        {
+            if (!PlayerPrefs.HasKey(SaveKey))
+            {
+                return false;
+            }
+
+            string json = PlayerPrefs.GetString(SaveKey, string.Empty);
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return false;
+            }
+
+            BoardData boardData = JsonUtility.FromJson<BoardData>(json);
+
+            if (boardData == null || boardData.cells == null || boardData.cells.Count == 0)
+            {
+                return false;
+            }
+
+            gridWidth = boardData.width;
+            gridHeight = boardData.height;
+            startPipeCoordinates = new Vector2Int(boardData.startX, boardData.startY);
+            pipes = new Pipe[gridWidth, gridHeight];
+            gridConnections = new List<int>[gridWidth, gridHeight];
+
+            Vector2 offset = 0.5f * cellSize * new Vector2(1 - gridWidth, 1 - gridHeight);
+
+            foreach (var cell in boardData.cells)
+            {
+                gridConnections[cell.x, cell.y] = new List<int>(cell.connections);
+
+                DirectionsToTypeRotation(gridConnections[cell.x, cell.y], out PipeType type);
+             
+                Pipe pipe = Instantiate(GetPipePrefab(type), pipeContainerTransform);
+                pipe.name = $"Pipe({cell.x},{cell.y})";
+                ((RectTransform)pipe.transform).anchoredPosition = offset + new Vector2(cell.x * cellSize, cell.y * cellSize);
+                pipe.Initialize(cell.x, cell.y, cell.rotation, this);
+                pipes[cell.x, cell.y] = pipe;
+            }
+
+            pipes[startPipeCoordinates.x, startPipeCoordinates.y].BecomeStartPipe();
+            
+            gameStartTime = Time.time - Mathf.Max(0f, boardData.elapsedSeconds);
+
+            return true;
+        }
+
+
+        private void DeleteSave()
+        {
+            if (PlayerPrefs.HasKey(SaveKey))
+            {
+                PlayerPrefs.DeleteKey(SaveKey);
+                PlayerPrefs.Save();
+            }
         }
     }
 }
