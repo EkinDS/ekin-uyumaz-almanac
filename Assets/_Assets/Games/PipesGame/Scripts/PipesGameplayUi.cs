@@ -20,14 +20,19 @@ namespace _Assets.PipesGame
         [SerializeField] private List<Pipe> pipePrefabs;
         [SerializeField] private List<ParticleSystem> confettiParticles;
 
+
+        private const float CellSize = 150F;
+        private const float SaveCooldown = 0.25F;
+        private const string SaveKey = "PipesGameSaveKey";
+
+        private float gameStartTime;
+        private float nextAllowedSaveTime;
         private int gridWidth = 5;
         private int gridHeight = 5;
-        private float cellSize = 150F;
-        private float gameStartTime;
-        private Pipe[,] pipes;
-        private Vector2Int startPipeCoordinates;
-        private List<int>[,] gridConnections;
         private bool levelFinished;
+        private Pipe[,] pipes;
+        private List<int>[,] gridConnections;
+        private Vector2Int startPipeCoordinates;
         private Sequence levelFinishSequence;
 
 
@@ -63,7 +68,11 @@ namespace _Assets.PipesGame
         {
             ValidateAndHighlight();
 
-            SaveGame();
+            if (Time.unscaledTime >= nextAllowedSaveTime)
+            {
+                SaveGame();
+                nextAllowedSaveTime = Time.unscaledTime + SaveCooldown;
+            }
         }
 
 
@@ -104,7 +113,7 @@ namespace _Assets.PipesGame
 
             gridConnections = GenerateConnections(startPipeCoordinates);
 
-            Vector2 offset = 0.5f * cellSize * new Vector2(1 - gridWidth, 1 - gridHeight);
+            Vector2 offset = 0.5f * CellSize * new Vector2(1 - gridWidth, 1 - gridHeight);
 
             for (int x = 0; x < gridWidth; x++)
             {
@@ -116,7 +125,7 @@ namespace _Assets.PipesGame
 
                     Pipe pipe = Instantiate(prefab, pipeContainerTransform);
                     pipe.name = $"Pipe({x},{y})";
-                    ((RectTransform)pipe.transform).anchoredPosition = offset + new Vector2(x * cellSize, y * cellSize);
+                    ((RectTransform)pipe.transform).anchoredPosition = offset + new Vector2(x * CellSize, y * CellSize);
 
                     pipe.Initialize(x, y, 90 * Random.Range(0, 4), this);
                     pipes[x, y] = pipe;
@@ -461,8 +470,6 @@ namespace _Assets.PipesGame
         }
 
 
-        //save load
-
         [System.Serializable]
         public class PipeData
         {
@@ -483,8 +490,6 @@ namespace _Assets.PipesGame
             public List<PipeData> cells;
         }
 
-
-        private const string SaveKey = "PipesGameSaveKey";
 
         private bool CanSave => gameObject.activeInHierarchy && !levelFinished;
 
@@ -568,23 +573,24 @@ namespace _Assets.PipesGame
             pipes = new Pipe[gridWidth, gridHeight];
             gridConnections = new List<int>[gridWidth, gridHeight];
 
-            Vector2 offset = 0.5f * cellSize * new Vector2(1 - gridWidth, 1 - gridHeight);
+            Vector2 offset = 0.5f * CellSize * new Vector2(1 - gridWidth, 1 - gridHeight);
 
             foreach (var cell in boardData.cells)
             {
                 gridConnections[cell.x, cell.y] = new List<int>(cell.connections);
 
                 DirectionsToTypeRotation(gridConnections[cell.x, cell.y], out PipeType type);
-             
+
                 Pipe pipe = Instantiate(GetPipePrefab(type), pipeContainerTransform);
                 pipe.name = $"Pipe({cell.x},{cell.y})";
-                ((RectTransform)pipe.transform).anchoredPosition = offset + new Vector2(cell.x * cellSize, cell.y * cellSize);
+                ((RectTransform)pipe.transform).anchoredPosition =
+                    offset + new Vector2(cell.x * CellSize, cell.y * CellSize);
                 pipe.Initialize(cell.x, cell.y, cell.rotation, this);
                 pipes[cell.x, cell.y] = pipe;
             }
 
             pipes[startPipeCoordinates.x, startPipeCoordinates.y].BecomeStartPipe();
-            
+
             gameStartTime = Time.time - Mathf.Max(0f, boardData.elapsedSeconds);
 
             return true;
