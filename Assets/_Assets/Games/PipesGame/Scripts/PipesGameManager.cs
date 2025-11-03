@@ -18,6 +18,7 @@ namespace _Assets.PipesGame
                 SetUiPositions();
 
                 bool loaded = await pipesGameplayUi.LoadPipePrefabsAsync();
+                
                 if (!loaded)
                 {
                     Debug.LogError("Failed to load pipe prefabs.");

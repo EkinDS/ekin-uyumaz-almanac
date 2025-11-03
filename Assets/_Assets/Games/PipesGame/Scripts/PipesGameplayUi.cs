@@ -16,6 +16,8 @@ namespace _Assets.PipesGame
 {
     public class PipesGameplayUi : MonoBehaviour
     {
+        //Note: Pipe Indices: End = 0, Straight = 1, Elbow = 2, Tee = 3
+
         [SerializeField] private CanvasGroup pipesCanvasGroup;
         [SerializeField] private Button continueButton;
         [SerializeField] private Transform pipeContainerTransform;
@@ -38,10 +40,7 @@ namespace _Assets.PipesGame
         private bool levelFinished;
         private int gridWidth = 5;
         private int gridHeight = 5;
-
-
-        private readonly List<AsyncOperationHandle<GameObject>> loadedHandles = new();
-        private bool loadedPrefabs;
+        private List<AsyncOperationHandle<GameObject>> loadedHandles = new List<AsyncOperationHandle<GameObject>>();
 
 
         private void Update()
@@ -80,9 +79,7 @@ namespace _Assets.PipesGame
                     pipePrefabs.Add(loadedObject.GetComponent<Pipe>());
                 }
 
-                loadedPrefabs = pipePrefabs.Count >= 4;
-
-                return loadedPrefabs;
+                return pipePrefabs.Count >= 4;
             }
             catch (Exception e)
             {
@@ -103,14 +100,14 @@ namespace _Assets.PipesGame
                 StartTimer();
             }
 
-            ValidateAndHighlight();
+            CheckForSolutionAndShowProgress();
             ShowPipes();
         }
 
 
         public void OnPipeRotated()
         {
-            ValidateAndHighlight();
+            CheckForSolutionAndShowProgress();
 
             if (Time.unscaledTime >= nextAllowedSaveTime)
             {
@@ -184,7 +181,7 @@ namespace _Assets.PipesGame
             {
                 for (int y = 0; y < gridHeight; y++)
                 {
-                    DirectionsToTypeRotation(gridConnections[x, y], out PipeType type);
+                    DirectionsToTypeRotation(gridConnections[x, y], out int type);
 
                     Pipe prefab = GetPipePrefab(type);
 
@@ -199,15 +196,9 @@ namespace _Assets.PipesGame
         }
 
 
-        private Pipe GetPipePrefab(PipeType pipeType)
+        private Pipe GetPipePrefab(int pipeType)
         {
-            switch (pipeType)
-            {
-                case PipeType.Straight: return pipePrefabs[1];
-                case PipeType.Elbow: return pipePrefabs[2];
-                case PipeType.Tee: return pipePrefabs[3];
-                default: return pipePrefabs[0];
-            }
+            return pipePrefabs[pipeType];
         }
 
 
@@ -219,9 +210,9 @@ namespace _Assets.PipesGame
         }
 
 
-        private void ValidateAndHighlight()
+        private void CheckForSolutionAndShowProgress()
         {
-            PipeValidationResult result = ValidateConnections();
+            SolutionCheckResult result = CheckForSolutions();
 
             foreach (var pipe in pipes)
             {
@@ -233,7 +224,7 @@ namespace _Assets.PipesGame
                 foreach (var pipe in pipes)
                 {
                     Vector2Int p = new Vector2Int(pipe.X, pipe.Y);
-                    
+
                     if (!result.connectedTiles.Contains(p) && p != startPipeCoordinates)
                     {
                         pipe.IsConnected = false;
@@ -253,14 +244,14 @@ namespace _Assets.PipesGame
         }
 
 
-        private PipeValidationResult ValidateConnections()
+        private SolutionCheckResult CheckForSolutions()
         {
             int width = pipes.GetLength(0);
             int height = pipes.GetLength(1);
 
-            var result = new PipeValidationResult
+            var result = new SolutionCheckResult
             {
-                connectedTiles = new HashSet<Vector2Int>()
+                connectedTiles = new List<Vector2Int>()
             };
 
             var queue = new Queue<Vector2Int>();
@@ -286,8 +277,9 @@ namespace _Assets.PipesGame
                         continue;
                     }
 
-                    if (result.connectedTiles.Add(tileToAnalyze))
+                    if (!result.connectedTiles.Contains(tileToAnalyze))
                     {
+                        result.connectedTiles.Add(tileToAnalyze);
                         queue.Enqueue(tileToAnalyze);
                     }
                 }
@@ -314,22 +306,6 @@ namespace _Assets.PipesGame
                 case 3: return new Vector2Int(-1, 0);
                 default: return Vector2Int.zero;
             }
-        }
-
-
-        private struct PipeValidationResult
-        {
-            public bool isFullyConnected;
-            public HashSet<Vector2Int> connectedTiles;
-        }
-
-
-        private enum PipeType
-        {
-            End,
-            Straight,
-            Elbow,
-            Tee
         }
 
 
@@ -387,25 +363,25 @@ namespace _Assets.PipesGame
         }
 
 
-        private static void DirectionsToTypeRotation(List<int> directions, out PipeType type)
+        private static void DirectionsToTypeRotation(List<int> directions, out int pipeType)
         {
             var list = new List<int>(directions);
 
             switch (list.Count)
             {
                 case 1:
-                    type = PipeType.End;
+                    pipeType = 0;
                     break;
                 case 2:
                     bool isStraight = (list.Contains(0) && list.Contains(2)) || (list.Contains(1) && list.Contains(3));
-                    type = isStraight ? PipeType.Straight : PipeType.Elbow;
+                    pipeType = isStraight ? 1 : 2;
                     break;
                 case 3:
-                    type = PipeType.Tee;
+                    pipeType = 3;
                     break;
                 default:
                     Debug.Log("There is a problem here.");
-                    type = PipeType.End;
+                    pipeType = 0;
                     break;
             }
         }
@@ -516,44 +492,6 @@ namespace _Assets.PipesGame
             continueButton.gameObject.SetActive(true);
         }
 
-
-        private void OnDestroy()
-        {
-            levelFinishSequence.Kill();
-
-
-            // Yüklenenleri serbest bırakın
-            foreach (var h in loadedHandles)
-            {
-                if (h.IsValid()) Addressables.Release(h);
-            }
-
-            loadedHandles.Clear();
-            loadedPrefabs = false;
-        }
-
-
-        [System.Serializable]
-        public class PipeData
-        {
-            public int x;
-            public int y;
-            public int rotation;
-            public List<int> connections;
-        }
-
-        [System.Serializable]
-        public class BoardData
-        {
-            public int width;
-            public int height;
-            public int startX;
-            public int startY;
-            public float elapsedSeconds;
-            public List<PipeData> cells;
-        }
-
-
         private bool CanSave => gameObject.activeInHierarchy && !levelFinished;
 
 
@@ -618,18 +556,8 @@ namespace _Assets.PipesGame
 
             string json = PlayerPrefs.GetString(SaveKey, string.Empty);
 
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                return false;
-            }
-
             BoardData boardData = JsonUtility.FromJson<BoardData>(json);
-
-            if (boardData == null || boardData.cells == null || boardData.cells.Count == 0)
-            {
-                return false;
-            }
-
+            
             gridWidth = boardData.width;
             gridHeight = boardData.height;
             startPipeCoordinates = new Vector2Int(boardData.startX, boardData.startY);
@@ -642,12 +570,11 @@ namespace _Assets.PipesGame
             {
                 gridConnections[cell.x, cell.y] = new List<int>(cell.connections);
 
-                DirectionsToTypeRotation(gridConnections[cell.x, cell.y], out PipeType type);
+                DirectionsToTypeRotation(gridConnections[cell.x, cell.y], out int type);
 
                 Pipe pipe = Instantiate(GetPipePrefab(type), pipeContainerTransform);
                 pipe.name = $"Pipe({cell.x},{cell.y})";
-                ((RectTransform)pipe.transform).anchoredPosition =
-                    offset + new Vector2(cell.x * CellSize, cell.y * CellSize);
+                ((RectTransform)pipe.transform).anchoredPosition = offset + new Vector2(cell.x * CellSize, cell.y * CellSize);
                 pipe.Initialize(cell.x, cell.y, cell.rotation, this);
                 pipes[cell.x, cell.y] = pipe;
             }
@@ -667,6 +594,48 @@ namespace _Assets.PipesGame
                 PlayerPrefs.DeleteKey(SaveKey);
                 PlayerPrefs.Save();
             }
+        }
+
+
+        private void OnDestroy()
+        {
+            levelFinishSequence.Kill();
+
+            foreach (var loadedHandle in loadedHandles)
+            {
+                Addressables.Release(loadedHandle);
+            }
+
+            loadedHandles.Clear();
+        }
+        
+
+        [Serializable]
+        public class PipeData
+        {
+            public int x;
+            public int y;
+            public int rotation;
+            public List<int> connections;
+        }
+
+        
+        [Serializable]
+        public class BoardData
+        {
+            public int width;
+            public int height;
+            public int startX;
+            public int startY;
+            public float elapsedSeconds;
+            public List<PipeData> cells;
+        }
+        
+
+        private struct SolutionCheckResult
+        {
+            public bool isFullyConnected;
+            public List<Vector2Int> connectedTiles;
         }
     }
 }
